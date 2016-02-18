@@ -1,3 +1,4 @@
 RestApi/RestApiCSharp/obj/
 RestApi/RestApiCSharp/bin/
 *.suo
+RestApi/packages/

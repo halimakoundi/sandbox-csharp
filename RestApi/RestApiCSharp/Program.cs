@@ -10,12 +10,14 @@ using System.Linq;
     REST is an architectural style that builds on the same principles that provide the foundation of the World Wide Web. 
     Clients interact with services by making HTTP requests, and services respond with HTTP responses, 
     which often include a representation of a resource that client code can use to drive an application.
+    http://blog.smartbear.com/apis/understanding-soap-and-rest-basics/
 */
 
 namespace RestApiTuto
 {
-    class MainClass{
-        
+    class StepByStep
+    {
+
         static void Main(string[] args)
         {
             /*
@@ -26,46 +28,29 @@ namespace RestApiTuto
              * HN users submit interesting stories from around the web that are upvoted by other users.
              * When a post receives enough upvotes it makes it to the front page. 
             */
-            string details = GethackerNewsTopStories ();
+            string details = GethackerNewsTopStories();
             //Uncomment below to print the raw result from the webRequest
-            //Console.WriteLine(details); 
+
+            Console.WriteLine(details);
+            //step 1 : calling the api
             //You can compare results : https://news.ycombinator.com/news
 
-            //serialisation of the resut
             /*
              * https://msdn.microsoft.com/en-us/library/ms233843.aspx
              * Here we are using the powerfull and widespread Newtonsoft JSON library
              * http://www.newtonsoft.com/json/help/html/deserializeobject.htm
             */
-            int[] topStoriesIds = JsonConvert.DeserializeObject<int[]>(details);
-            GethackerNewsItem(topStoriesIds);
+            //step 2 : serialisation of the result
+            //int[] topStoriesIds = JsonConvert.DeserializeObject<int[]>(details);
+            //GethackerNewsItem(topStoriesIds);
+
             Console.ReadLine();
         }
-         
+
         public static string GethackerNewsTopStories()
         {
             string url = "https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty";
             return CallRestMethod(url);
-        }
-
-        public static void GethackerNewsItem(int[] topStoriesIds)
-        {            
-            //Take() Method is a linq extension method method that allows us to query data on collections in a similar way to SQL data queries
-            foreach(var story in topStoriesIds.Take(1)){                    
-                string url = string.Format("https://hacker-news.firebaseio.com/v0/item/{0}.json?print=pretty", story); 
-                //Uncomment below to print the raw result from the webRequest
-                Console.WriteLine(CallRestMethod(url));    
-                BuildObjectFromJsonData (CallRestMethod (url));
-                                
-            }
-        }
-
-        public static object BuildObjectFromJsonData(string jsonData )
-        {            
-            HackerNewsItem item = JsonConvert.DeserializeObject<HackerNewsItem>(jsonData);
-            Console.WriteLine (item);
-            item.GetComments();
-            return item;
         }
 
         public static string CallRestMethod(string url)
@@ -97,12 +82,42 @@ namespace RestApiTuto
             {
                 //This allows you to do one Read operation.
                 // Releases the resources of the Stream.
-                result = responseStream.ReadToEnd();   
+                result = responseStream.ReadToEnd();
             }
             //We must close the stream and release the connection for reuse
             //Failure to close the stream will cause your application to run out of connections
             webresponse.Close();
             return result;
+        }
+
+        #region Step2
+        /* step 2 
+        public static void GethackerNewsItem(int[] topStoriesIds)
+        {
+            //Take() Method is a linq extension method method that allows us to query data on collections in a similar way to SQL data queries
+            foreach (var story in topStoriesIds.Take(1))
+            {
+                string url = string.Format("https://hacker-news.firebaseio.com/v0/item/{0}.json?print=pretty", story);
+                //Uncomment below to print the raw result from the webRequest
+                Console.WriteLine(CallRestMethod(url));
+                //Step 3 : Deserialisation with custom object
+                //BuildObjectFromJsonData(CallRestMethod(url));
+
+            }
+        }
+        */
+        #endregion
+
+        #region Step3
+
+        /* Step 3
+        public static object BuildObjectFromJsonData(string jsonData)
+        {
+            HackerNewsItem item = JsonConvert.DeserializeObject<HackerNewsItem>(jsonData);
+            Console.WriteLine(item);
+            //Step 4 : getting comments
+            //item.GetComments();
+            return item;
         }
 
         public static DateTime UnixTimeStampToDateTime( double unixTimeStamp )
@@ -114,8 +129,14 @@ namespace RestApiTuto
             dtDateTime = dtDateTime.AddSeconds( unixTimeStamp ).ToLocalTime();
             return dtDateTime;
         }
+         
+        */
+        #endregion
+
     }
 
+    #region Step3 HackerNewsItem
+    /*
     public class HackerNewsItem {
         
         public string by {get;set;}
@@ -129,14 +150,14 @@ namespace RestApiTuto
         public string type {get;set;}
         public string url {get;set;}
 
-        //Getting associated comments 
-        public void GetComments(){
-            //We only print the 5 first comments
-            foreach (var kid in this.kids.Take(5)) {
-                string url = string.Format("https://hacker-news.firebaseio.com/v0/item/{0}.json?print=pretty", kid); 
-                Console.WriteLine(MainClass.CallRestMethod (url));
-            }
-        }
+        //Step 4 - Getting associated comments 
+        //public void GetComments(){
+        //    //We only print the 5 first comments
+        //    foreach (var kid in this.kids.Take(5)) {
+        //        string url = string.Format("https://hacker-news.firebaseio.com/v0/item/{0}.json?print=pretty", kid); 
+        //        Console.WriteLine(MainClass.CallRestMethod (url));
+        //    }
+        //}
 
         //Building the override of the toString method to print the object
         public override string ToString ()
@@ -145,12 +166,15 @@ namespace RestApiTuto
         }
 
     }
+    */
+    #endregion
+
 }
 
 /*
- * Going further :
+ * Exercises :
  * 
- * 1. Build a C# Object for comments and populate with data retrieved from the GetComments method of HackerNewsItems
+ * 1. Build a C# Object for comments and deserialise data retrieved from the GetComments method of HackerNewsItems
  * 
  * 2. Query all jobs, shows or asks listed on HackerNews ( https://hacker-news.firebaseio.com/v0/<job, show, or ask>stories.json?print=pretty)
  * 
@@ -158,4 +182,5 @@ namespace RestApiTuto
  *  
  * 4. Parse the list of stories and lookout for your favorite domain (and integrate with twilio bit.ly/1Lu4RPw)
  * 
+ * To play around with more web services : http://free-web-services.com/
 */
