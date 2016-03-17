@@ -2,3 +2,5 @@ RestApi/RestApiCSharp/obj/
 RestApi/RestApiCSharp/bin/
 *.suo
 RestApi/packages/
+PlayingWithContainers/bin/
+PlayingWithContainers/obj/
